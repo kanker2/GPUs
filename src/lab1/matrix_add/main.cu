@@ -30,7 +30,9 @@ void addMatrix(float *a, float *b, float *c, int N)
 
 __global__ void addMatrixGPU(float *a, float *b, float *c, int N )
 {
-	....
+	int i = blockIdx.x, j = threadIdx.x;
+	if (i*N + j < N*N)
+		a[i*N+j] = b[i*N+j] + c[i*N+j];
 }
 
 int main(int argc, char *argv[])
@@ -41,7 +43,6 @@ int main(int argc, char *argv[])
 	int i, j, N;
 
 	double t0, t1;
-
 
 	if(argc>1) {
 		N = atoi(argv[1]); printf("N=%i\n", N);
@@ -64,27 +65,29 @@ int main(int argc, char *argv[])
 	t1 = wtime(); printf("Time CPU=%f\n", t1-t0);
 
 	/* Mallocs GPU */
-	cudaMalloc(...);
-	cudaMalloc(...);
-	cudaMalloc(...);
+	cudaMalloc((void **) &a_GPU, sizeof(float)*N*N);
+	cudaMalloc((void **) &b_GPU, sizeof(float)*N*N);
+	cudaMalloc((void **) &c_GPU, sizeof(float)*N*N);
 
 	/* CPU->GPU */
-	cudaMemcpy(...);
-	cudaMemcpy(...);
+	cudaMemcpy(b_GPU, b, sizeof(float)*N*N, cudaMemcpyHostToDevice);
+	cudaMemcpy(c_GPU, c, sizeof(float)*N*N, cudaMemcpyHostToDevice);
 
 	/*****************/
 	/* Add Matrix GPU*/
 	/*****************/
-	dim3 dimBlock(...,...);
-	dim3 dimGrid(...,...);
+	float num_thrds = 16;
+	dim3 n_blocks(ceil(N*N / num_thrds));
+	dim3 n_threads(num_thrds);
+	
 	t0 = wtime();
-	addMatrixGPU<<<dimGrid,dimBlock>>>(a_GPU, b_GPU, c_GPU, N);
-	cudaThreadSynchronize();
+	addMatrixGPU<<<n_blocks,n_threads>>>(a_GPU, b_GPU, c_GPU, N);
+	cudaDeviceSynchronize();
 	t1 = wtime(); printf("Time GPU=%f\n", t1-t0);
 
 	/* GPU->CPU */
 	a_host  = (float *)malloc(sizeof(float)*N*N);
-	cudaMemcpy(...);
+	cudaMemcpy(a_host, a_GPU, sizeof(float)*N*N, cudaMemcpyDeviceToHost);
 
 	/************/
 	/* Results  */
@@ -96,6 +99,8 @@ int main(int argc, char *argv[])
 				printf("A[%i][%i] = %f A_GPU[%i][%i]=%f\n", i, j, a[i*N+j], i, j, a_host[i*N+j] );
 			}
 
+	printf("%d\n", ceil(N*N / num_thrds));
+
 	/* Free CPU */
 	free(a);
 	free(b);
@@ -103,9 +108,9 @@ int main(int argc, char *argv[])
 	free(a_host);
 
 	/* Free GPU */
-	cudaFree(...);
-	cudaFree(...);
-	cudaFree(...);
+	cudaFree(a_GPU);
+	cudaFree(b_GPU);
+	cudaFree(c_GPU);
 
 
 	return(1);
