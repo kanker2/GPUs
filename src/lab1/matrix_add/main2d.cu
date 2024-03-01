@@ -30,9 +30,10 @@ void addMatrix(float *a, float *b, float *c, int N)
 
 __global__ void addMatrixGPU(float *a, float *b, float *c, int N )
 {
-	int i = blockIdx.x, j = threadIdx.x, nt = blockDim.x;
-	if (i*nt + j < N*N)
-		a[i*nt+j] = b[i*nt+j] + c[i*nt+j];
+	int i = blockIdx.x * blockDim.x + threadIdx.x,
+			j = blockIdx.y * blockDim.y + threadIdx.y;
+	if (i < N && j < N)
+		a[i*N + j] = b[i*N + j] + c[i*N + j];
 }
 
 int main(int argc, char *argv[])
@@ -76,9 +77,9 @@ int main(int argc, char *argv[])
 	/*****************/
 	/* Add Matrix GPU*/
 	/*****************/
-	float num_thrds = 4;
-	dim3 n_blocks(ceil(float(N*N) / num_thrds));
-	dim3 n_threads(num_thrds);
+	float num_thrds = 2;
+	dim3 n_blocks(ceil(float(N) / num_thrds), ceil(float(N) / num_thrds));
+	dim3 n_threads(num_thrds, num_thrds);
 	
 	t0 = wtime();
 	addMatrixGPU<<<n_blocks,n_threads>>>(a_GPU, b_GPU, c_GPU, N);

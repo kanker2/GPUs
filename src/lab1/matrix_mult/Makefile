@@ -1,11 +1,11 @@
-CXX = g++
-CC = g++
+CXX = nvcc
+CC = nvcc
 NVCC = nvcc
 
 CFLAGS=-O3 -I. -I/usr/local/cuda/include 
 CXXFLAGS=-O3 -I. -I/usr/local/cuda/include
 
-LIBS = -lm -lcuda -lcudart
+LIBS = -lm -lcuda
 
 SRC =  main.o matrix_mul.o
 	

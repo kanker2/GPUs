@@ -70,8 +70,8 @@ int main(int argc, char *argv[])
 	cudaMalloc((void **) &c_GPU, sizeof(float)*N*N);
 
 	/* CPU->GPU */
-	cudaMemcpy(b_GPU, b, sizeof(float)*N*N, cudaMemcpyHostToDevice);
-	cudaMemcpy(c_GPU, c, sizeof(float)*N*N, cudaMemcpyHostToDevice);
+	cudaMemcpyToSymbol(b_GPU, b, sizeof(float)*N*N, cudaMemcpyHostToDevice);
+	cudaMemcpyToSymbol(c_GPU, c, sizeof(float)*N*N, cudaMemcpyHostToDevice);
 
 	/*****************/
 	/* Add Matrix GPU*/
