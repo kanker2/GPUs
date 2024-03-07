@@ -4,5 +4,6 @@
 //extern "C"
 void Mul___(float* A, float* B, int hA, int wA, int wB, float* C);
 
-	
+double wtime(void);
+
 #endif

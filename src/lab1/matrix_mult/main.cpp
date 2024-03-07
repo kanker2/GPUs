@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <sys/time.h>
 #include <malloc.h>
 #include <stdlib.h>
 #include <math.h>
@@ -30,12 +31,14 @@ void print_matrix(float *M, int hM, int wM)
 
 int diff(float *A, float *B, int hA, int wA, int wB, float *C)
 {
+	double t0,t1;
 	float *C_cpu;
 	int size_C = wB * hA;
 	C_cpu = (float*)malloc(size_C*sizeof(float));
 
 	int i,j,k;
 
+	t0 = wtime();
 	for (i=0; i<hA; i++)
 		for (j=0; j<wB; j++){
 			C_cpu[i*wB+j] = 0.0;
@@ -43,8 +46,9 @@ int diff(float *A, float *B, int hA, int wA, int wB, float *C)
 				C_cpu[i*wB+j] += A[i*wA+k]*B[k*wB+j];
 			}
 		}
+	t1 = wtime();
 	//printf("\n\nMATRIX C_cpu\n");print_matrix(C_cpu, hA, wB);
-
+	printf("Time CPU?%f\n", t1-t0);
 	for (i=0; i<hA; i++)
 		for (j=0; j<wB; j++)
 			if (fabsf(C_cpu[i*wB+j]-C[i*wB+j])>1e-5)
