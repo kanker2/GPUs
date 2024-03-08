@@ -61,7 +61,7 @@ void canny(uint8_t *im, uint8_t *image_out,
 			else if (fabs(phi[i*width+j]) <= 7*(PI/8))
 				phi[i*width+j] = 135;
 			else phi[i*width+j] = 0;
-	}
+		}
 
 	// Edge
 	for(i=3; i<height-3; i++)
@@ -252,13 +252,14 @@ void draw_lines(uint8_t *imgtmp, int width, int height, int *x1, int *y1, int *x
 }
 
 void lane_assist_CPU(uint8_t *im, int height, int width,
-	uint8_t *imEdge, float *NR, float *G, float *phi, float *Gx, float *Gy, uint8_t *pedge,
+	uint8_t *imEdge, float *NR, float *G, float *phi, float *Gx, float *Gy,
+	uint8_t *pedge,
 	float *sin_table, float *cos_table, 
 	uint32_t *accum, int accu_height, int accu_width,
 	int *x1, int *y1, int *x2, int *y2, int *nlines)
 {
 	int threshold;
-
+	
 	/* Canny */
 	canny(im, imEdge,
 		NR, G, phi, Gx, Gy, pedge,
