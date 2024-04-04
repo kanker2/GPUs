@@ -1,4 +1,9 @@
 /*
+ * Pasar de un array de estructuras AoS
+ * a una estructura de arrays SoA
+ * */
+
+/*
     This file is part of the example codes which have been used
     for the "Code Optmization Workshop".
     
